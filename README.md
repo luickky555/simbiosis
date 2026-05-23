@@ -334,10 +334,5 @@ Essas escolhas reduzem dependência da rede e ajudam a manter o sistema mais lev
 
 ## Créditos
 
-Projeto voltado para agricultura familiar, com foco em produtividade no campo, resistência à falta de internet e preservação de dados locais.
-
+Projeto voltado para agricultura familiar, com foco em produtividade no campo, resistência à falta de internet e preservação de dados locais
 ---
-
-## Licença
-
-Adicione aqui a licença do projeto, se desejar.
