@@ -1,0 +1,15 @@
+{
+  "name": "SIMBIOSIS LITE",
+  "short_name": "SIMBIOSIS",
+  "description": "SIMBIOSIS LITE: plataforma offline-first para agricultura familiar em consórcio.",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f2e8",
+  "theme_color": "#2f6b3f",
+  "icons": [
+    { "src": "icone.php?size=192&v=0.4.6", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icone.php?size=512&v=0.4.6", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

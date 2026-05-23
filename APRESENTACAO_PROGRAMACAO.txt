@@ -1,0 +1,192 @@
+APRESENTAÇÃO - EXPLICAÇÃO DA PROGRAMAÇÃO (SIMBIOSIS LITE)
+
+0) Objetivo da apresentação
+- Explicar como a gente programou o sistema (do jeito mais claro possível).
+- Mostrar as partes principais: telas, banco local, sincronização, API e banco do servidor.
+- Deixar fácil de apresentar em sala (tipo roteiro).
+
+1) Ideia do projeto (problema e solução)
+- Problema: no campo a internet falha muito e a pessoa precisa registrar coisas mesmo assim.
+- Solução: fazer um app que funciona offline (salva no celular) e quando tiver internet ele sincroniza.
+- Resultado: o usuário usa como app instalado (PWA) e não perde os dados.
+
+2) Tecnologias usadas (bem direto)
+- Front-end: HTML + CSS + JavaScript (módulos ES6).
+- PWA: manifesto.webmanifest + Service Worker (cache offline).
+- Banco no celular: IndexedDB.
+- Back-end: PHP (API em rotas).
+- Banco do servidor: MySQL.
+
+3) Estrutura de arquivos (pra entender rápido)
+Arquivo de entrada do app:
+- inicio.php
+  - Carrega o CSS e o JS principal.
+  - Passa config para o JS via window.__RQ__ (nome, versão, apiBase).
+
+Arquivos do PWA:
+- manifesto.webmanifest
+  - Diz como o app “instala” e qual ícone usar.
+- trabalhador_servico.js
+  - Faz o cache dos arquivos e permite abrir sem internet.
+- icone.php
+  - Gera o ícone do app.
+
+Arquivos principais do JavaScript:
+- app/js/aplicativo.js
+  - Tela inicial, rotas (#/home, #/diario, #/ajuda, etc.), botões, fluxo geral.
+- app/js/sincronizacao.js
+  - Fila (outbox) e sincronização com o servidor.
+
+Bibliotecas (app/js/lib):
+- utilitarios.js (funções pequenas usadas em tudo: criar elemento, toast, datas, etc.)
+- banco_local.js (IndexedDB: meta, user, records, images, outbox)
+- cliente_api.js (fetch para a API do PHP + tratamento de erro)
+- dispositivo.js (gera e guarda o X-Device-Id)
+- imagem.js (reduz a foto, pega pixels e checa qualidade)
+
+IA local (app/js/cv):
+- solo.js (análise simples do solo)
+- pragas.js (conta pontinhos na armadilha e tendência)
+- planta.js (sede e suspeita de nutriente pela folha)
+
+Servidor (PHP):
+- api/inicio.php (rotas da API)
+- api/lib/* (classes repositório e utilidades)
+
+Banco (SQL):
+- db/esquema.sql (tabelas do servidor)
+
+4) Como as telas funcionam (front-end)
+Ideia:
+- A gente usa rotas por hash (#/algumaCoisa).
+- Quando o usuário clica em um botão, muda a rota.
+- O JS monta o HTML “na mão” (com a função el()) e coloca no <main>.
+
+No aplicativo.js tem:
+- Funções que montam cada tela (Início, Diário, Ajuda, Solo, Pragas, Consórcio, Planta).
+- Funções para criar registros no Diário.
+- Funções para tirar foto (input file/câmera), reduzir e analisar.
+
+5) Banco local (IndexedDB) - por que e como
+Por que:
+- LocalStorage não serve bem pra fotos e muitos dados.
+- IndexedDB aceita Blob (foto) e é mais robusto.
+
+Como:
+- banco_local.js abre o DB e cria stores:
+  - meta: configurações e status (cultura ativa, última sync)
+  - user: dados do cadastro
+  - records: histórico do Diário (todos os eventos)
+  - images: fotos (Blob) ligadas a um record_id
+  - outbox: fila de coisas pra enviar pro servidor
+
+6) Como a gente salva tudo (padrão de “registro”)
+Regra do app:
+- Sempre que o usuário faz algo importante, a gente cria um registro no Diário.
+Exemplos:
+- plant_check (foto e análise da planta)
+- pest_check (foto e contagem de pragas)
+- soil_check (pH e análise)
+- alert_published / alert_received
+
+Isso ajuda porque:
+- dá histórico
+- dá pra sincronizar depois
+- o app não perde o que a pessoa fez
+
+7) Sincronização (a parte mais importante do “offline”)
+Conceito:
+- Quando o app cria um registro/alerta, ele adiciona isso na outbox.
+- A outbox é tipo uma fila de “coisas pendentes”.
+- Quando tem internet, o app chama a API e manda um lote.
+
+Fluxo (simplificado):
+1) Cria registro no IndexedDB (records)
+2) Coloca uma mutação na outbox (upsert record/alert)
+3) Se estiver online:
+   - tenta garantir usuário no servidor (server_user_ok)
+   - chama /sync/push com mutations e last_pull
+4) O servidor devolve:
+   - ack: ids que ele aceitou
+   - server_time
+   - alerts novos da região
+5) O app remove da outbox o que foi confirmado e salva alertas recebidos no Diário
+
+8) Service Worker (modo offline)
+O que a gente faz:
+- No install do service worker, a gente baixa e guarda os arquivos principais.
+- Quando o usuário abre sem internet:
+  - os arquivos são lidos do cache
+  - o app funciona normal
+
+Regras usadas:
+- Para arquivos do app (css/js/php principal): usa cache primeiro (mais rápido).
+- Para API (/api/*): tenta internet primeiro e se não der, volta pro cache (quando existir).
+
+9) API (backend) em PHP - rotas principais
+Arquivo: api/inicio.php
+
+Rotas:
+- /users/register
+  - cria ou atualiza usuário pelo X-Device-Id
+- /users/me
+  - retorna dados do usuário atual
+- /users/claim_code
+  - resgata cadastro usando um código (producer_code)
+
+- /sync/push
+  - recebe mutations (records e alerts)
+  - salva no banco
+  - devolve ack e alertas novos da região
+
+- /alerts/publish e /alerts/pull
+  - publicar e puxar alertas por região (region_hash)
+
+- /plant/case, /plant/compare, /plant/feedback
+  - salvar features numéricas de casos da planta
+  - comparar com casos da comunidade
+  - salvar feedback (rótulo)
+
+10) Como o servidor identifica a pessoa (sem login)
+- A gente não fez login/senha porque a ideia é ser simples.
+- O app manda o X-Device-Id em todas as chamadas.
+- Esse id é gerado uma vez e guardado no IndexedDB (dispositivo.js).
+
+11) Banco do servidor (SQL) - tabelas
+Arquivo: db/esquema.sql
+
+Tabelas principais:
+- users
+  - device_id, first_name, community, region_hash, crops, producer_code
+- records
+  - user_id, local_uuid, type, payload, created_at
+- alerts
+  - region_hash, local_uuid, kind, severity, message, payload, created_at
+- plant_cases
+  - region_hash, crop, features, prediction, label, created_at
+
+12) Privacidade e segurança (do jeito simples)
+- A foto do usuário fica no celular (IndexedDB).
+- Pro servidor vai:
+  - registros de texto/JSON
+  - números (features) para comparação
+- Nada de senha no app.
+- O banco do servidor usa prepared statements (PDO) pra evitar SQL injection.
+
+13) Pontos difíceis e como a gente resolveu
+- Offline: resolvido com IndexedDB + outbox + service worker.
+- Foto pesada: resolvido reduzindo a imagem no canvas e salvando em JPEG.
+- Sincronização falhando: resolvido com tentativas automáticas e ack no servidor.
+- Região: resolvido com region_hash baseado na comunidade.
+
+14) Roteiro de demonstração (pra apresentar)
+1) Abrir o app e mostrar que é “instalável”.
+2) Fazer cadastro e escolher cultura.
+3) Fazer um registro (ex.: Planta Falante) e mostrar que aparece no Diário.
+4) Colocar o celular offline e repetir: mostrar que salva mesmo sem internet.
+5) Voltar a internet: mostrar que sincroniza e fica “verde” na sincronização.
+6) Mostrar alertas da comunidade e comparação de casos (quando online).
+
+15) Conclusão (frase pronta)
+- “A gente fez um sistema simples, offline-first, que guarda tudo no celular e sincroniza depois, focado em agricultura familiar.”
+

@@ -1,0 +1,184 @@
+:root{
+  --rq-green:#2f6b3f;
+  --rq-green-2:#3a8350;
+  --rq-cream:#f7f2e8;
+  --rq-ink:#1b1f1d;
+  --rq-muted:#5a6b62;
+  --rq-card:#ffffff;
+  --rq-border:rgba(0,0,0,.08);
+}
+
+html,body{
+  height:100%;
+  background:var(--rq-cream);
+}
+
+.rq-body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+  color:var(--rq-ink);
+  font-size:1.05rem;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.rq-topbar{
+  position:sticky;
+  top:0;
+  z-index:1030;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:.75rem;
+  height:64px;
+  padding:.25rem 1rem;
+  padding-left:0;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(180%) blur(10px);
+  border-bottom:1px solid var(--rq-border);
+  color:var(--rq-ink);
+}
+
+.rq-topbar__brand{ flex:1; position:relative; height:100%; min-width:0; }
+.rq-topbar__logo{ position:absolute; left:0; top:50%; transform:translateY(-40%); height:150px; width:auto; max-width:min(420px, 100%); object-fit:contain; }
+.rq-topbar__text{ min-width:0; }
+.rq-topbar__title{ font-weight:800; font-size:1.05rem; line-height:1.05rem; }
+.rq-topbar__subtitle{ font-size:.8rem; opacity:.9; }
+.rq-topbar__status{ font-size:.85rem; font-weight:800; padding:.35rem .6rem; border-radius:999px; background:rgba(47,107,63,.12); color:var(--rq-green); }
+
+.rq-main{
+  padding:1rem clamp(.75rem, 3.5vw, 1.25rem) 5.25rem;
+  max-width:720px;
+  margin:0 auto;
+}
+
+@media (max-width: 420px){
+  .rq-topbar{
+    flex-wrap:nowrap;
+    gap:.5rem;
+    height:64px;
+    padding:.55rem .75rem;
+    padding-left:0;
+  }
+  .rq-topbar__brand{ flex:1; height:100%; }
+  .rq-topbar__logo{ height:90px; max-width:70vw; }
+  .rq-topbar__status{ margin-left:auto; font-size:.78rem; padding:.3rem .5rem; }
+}
+
+.rq-card{
+  border:0;
+  border-radius:18px;
+  box-shadow:0 8px 22px rgba(0,0,0,.06);
+  background:var(--rq-card);
+}
+
+.rq-btn-big{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:.9rem;
+  padding:1rem 1rem;
+  min-height:86px;
+  border-radius:18px;
+  border:0;
+  background:var(--rq-card);
+  box-shadow:0 8px 22px rgba(0,0,0,.06);
+  text-align:left;
+}
+.rq-btn-big:active{ transform:translateY(1px); }
+.rq-btn-big__icon{
+  width:54px; height:54px;
+  display:grid; place-items:center;
+  border-radius:16px;
+  background:rgba(47,107,63,.12);
+  font-size:28px;
+}
+.rq-btn-big__title{ font-weight:800; font-size:1.05rem; margin:0; }
+.rq-btn-big__desc{ color:var(--rq-muted); margin:0; font-size:.95rem; }
+
+.rq-bottombar{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  z-index:1030;
+  display:flex;
+  gap:.25rem;
+  padding:.5rem .5rem calc(.5rem + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.96);
+  border-top:1px solid var(--rq-border);
+  backdrop-filter:saturate(180%) blur(10px);
+}
+.rq-navbtn{
+  flex:1;
+  border:0;
+  background:transparent;
+  border-radius:14px;
+  padding:.55rem .2rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.2rem;
+}
+.rq-navbtn[aria-current="page"]{
+  background:rgba(47,107,63,.10);
+}
+.rq-navbtn__icon{ font-size:22px; }
+.rq-navbtn__label{ font-size:.8rem; font-weight:700; color:var(--rq-ink); }
+
+.rq-field label{ font-weight:800; }
+.rq-help{ color:var(--rq-muted); font-size:.92rem; }
+
+.rq-photo{
+  width:100%;
+  border-radius:18px;
+  background:#fff;
+  aspect-ratio:4/3;
+  object-fit:cover;
+  border:1px solid var(--rq-border);
+}
+
+.rq-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  padding:.25rem .6rem;
+  border-radius:999px;
+  background:rgba(47,107,63,.12);
+  color:var(--rq-green);
+  font-weight:800;
+}
+
+.rq-toastwrap{
+  position:fixed;
+  left:0; right:0;
+  bottom:5.25rem;
+  z-index:2000;
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+  padding:0 .75rem;
+  pointer-events:none;
+}
+.rq-toast{
+  pointer-events:auto;
+  border-radius:16px;
+  padding:.75rem .9rem;
+  background:#1b1f1d;
+  color:#fff;
+  box-shadow:0 12px 28px rgba(0,0,0,.22);
+  font-weight:700;
+}
+
+.rq-kbd{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  font-size:.95em;
+  padding:.1em .35em;
+  border-radius:8px;
+  background:#0000000d;
+}
+
+.rq-btn-big:focus-visible,
+.rq-navbtn:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  outline:3px solid rgba(47,107,63,.35);
+  outline-offset:2px;
+}

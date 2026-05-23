@@ -1,0 +1,136 @@
+SIMBIOSIS LITE - EXPLICAÇÃO DO SISTEMA (texto simples)
+
+1) O que é esse sistema?
+- O SIMBIOSIS LITE é um app que roda no navegador do celular (tipo um app instalável).
+- Ele funciona mesmo sem internet (offline).
+- Ele ajuda no dia a dia da roça: Solo, Pragas, Consórcio, Planta Falante e Diário.
+
+2) Como o app abre (arquivos principais)
+- inicio.php
+  - É a “capa” do sistema. Carrega o CSS e o JavaScript.
+  - Também define umas infos no window.__RQ__ (nome, versão, caminho da API).
+
+- manifesto.webmanifest
+  - É o arquivo que faz o celular entender que é um app instalável (PWA).
+  - Define nome, ícone e como abre (tela cheia).
+
+- trabalhador_servico.js
+  - É o Service Worker (o modo offline).
+  - Ele guarda os arquivos principais no cache.
+  - Quando não tem internet, ele permite abrir o app do mesmo jeito.
+
+- icone.php
+  - Gera os ícones do app (192 e 512), pegando de logo/icone se tiver.
+
+3) Como o app funciona sem internet (offline)
+- A regra do sistema é: primeiro salva no celular, depois tenta mandar pra internet.
+- O “banco local” é o IndexedDB (banco do navegador).
+
+Arquivos do lado do app (front-end):
+- app/js/aplicativo.js
+  - É o arquivo principal. Monta as telas, botões e faz o fluxo do app.
+
+- app/js/lib/banco_local.js
+  - É o banco local (IndexedDB).
+  - O app guarda:
+    - meta: coisinhas pequenas (status de sync, cultura ativa)
+    - user: cadastro do usuário (nome, comunidade, culturas)
+    - records: o Diário (tudo que o usuário fez)
+    - images: fotos (guardadas como Blob) ligadas a um registro
+    - outbox: fila do que falta mandar pro servidor
+
+- app/js/sincronizacao.js
+  - É a parte que manda a fila (outbox) pro servidor.
+  - Também puxa alertas da comunidade (só da mesma região).
+
+4) Como são os dados (Diário)
+- Quase tudo que o usuário faz vira um registro no Diário.
+- Um registro tem:
+  - id (um texto único)
+  - type (tipo do registro, ex.: plant_check, alert_received etc.)
+  - created_at (data/hora)
+  - data (o conteúdo)
+- Fotos não vão pro servidor: ficam no IndexedDB na tabela images.
+
+5) Como funciona a sincronização (quando tem internet)
+Quando o celular tem internet:
+- O app tenta garantir que o usuário existe no servidor (pelo X-Device-Id).
+- Ele pega os itens da outbox e manda pro servidor:
+  - registros do Diário
+  - alertas publicados
+- O servidor responde dizendo quais itens ele aceitou (ack).
+- O app apaga da fila os itens confirmados.
+- O app também recebe alertas novos da comunidade (da mesma região).
+
+6) Como o servidor identifica a pessoa (sem login)
+- O app manda um cabeçalho HTTP chamado X-Device-Id.
+- Esse X-Device-Id é gerado 1 vez e salvo no banco local.
+- No servidor, isso vira o “id do celular” para achar o usuário.
+
+7) Como a “região” funciona (comunidade)
+- No cadastro, a pessoa digita a comunidade.
+- O servidor normaliza o texto e gera um region_hash (um código da comunidade).
+- Alertas e casos de planta usam region_hash pra não misturar regiões diferentes.
+
+8) Partes de “IA local” (no celular)
+Essas partes rodam no próprio celular (sem internet), usando a foto:
+- app/js/cv/solo.js
+  - Faz uma análise simples do solo com pH + tom + cor média.
+
+- app/js/cv/pragas.js
+  - Conta pontinhos na armadilha e tenta ver tendência (subindo/caindo).
+
+- app/js/cv/planta.js
+  - Tenta ver sede e suspeita de falta de nutriente pela foto da folha.
+
+Também tem utilitários de imagem:
+- app/js/lib/imagem.js
+  - Reduz a foto, pega pixels (ImageData) e checa se a foto tá boa.
+
+9) Planta Falante e comparações “na internet”
+- A análise principal roda no celular.
+- Quando o celular está online, o app pode comparar “números” com:
+  - casos da comunidade (salvos no servidor)
+  - algumas referências públicas (imagens de exemplo)
+Importante:
+- A foto do usuário NÃO é enviada pro servidor.
+- O que vai é um conjunto de números (features).
+
+10) API (backend em PHP)
+Arquivo principal:
+- api/inicio.php
+  - Recebe as rotas /users/*, /sync/*, /alerts/*, /plant/*
+
+Arquivos da API (api/lib):
+- Resposta.php
+  - Padroniza JSON e erros.
+- Requisicao.php
+  - Lê JSON, método, caminho e X-Device-Id.
+- Configuracao.php
+  - Lê config do banco via variáveis de ambiente.
+- Banco.php
+  - Cria conexão PDO e tem pequenas correções no banco.
+- RepositorioUsuarios.php
+  - Cria/atualiza usuário, region_hash e producer_code.
+- RepositorioRegistros.php
+  - Guarda os registros do Diário no banco.
+- RepositorioAlertas.php
+  - Publica e puxa alertas por região.
+- RepositorioCasosPlanta.php
+  - Salva e compara casos de planta por cultura e região.
+
+11) Banco do servidor (SQL)
+- db/esquema.sql
+  - É o script do banco MySQL/MariaDB.
+  - Tabelas principais:
+    - users
+    - records
+    - alerts
+    - plant_cases
+
+12) Resumo bem curto (pra entender rápido)
+- O app sempre salva no celular primeiro.
+- Quando tem internet, ele sincroniza com o servidor.
+- O servidor organiza por região (comunidade) e por cultura.
+- Fotos ficam no celular; pro servidor vai só “números” da análise.
+
