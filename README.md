@@ -390,4 +390,4 @@ Desenvolvimento com apoio de **IA via Blackbox AI** para acelerar e organizar pa
 
 **SIMBIOSIS LITE** — tecnologia pensada para o campo, com funcionamento real mesmo offline.
 
-</div>
+</div> 
