@@ -39,7 +39,7 @@ O SIMBIOSIS LITE foi criado justamente para esse cenário: **o trabalho não pod
 
 ---
 
-## Principais recursos
+## Principais recursos:
 
 ### Offline de verdade
 
@@ -72,7 +72,7 @@ O servidor recebe apenas os **dados numéricos e metadados necessários**. As im
 
 ---
 
-## Arquitetura
+## Arquitetura:
 
 O projeto segue uma arquitetura simples, robusta e fácil de manter:
 
@@ -105,7 +105,7 @@ A API em PHP recebe as requisições com `X-Device-Id`, valida os dados e persis
 
 ---
 
-## Tecnologias utilizadas
+## Tecnologias utilizadas:
 
 ### Front-end
 
@@ -144,7 +144,7 @@ Usada como apoio no desenvolvimento para acelerar tarefas técnicas, revisar tre
 
 ---
 
-## Fluxo de funcionamento
+## Fluxo de funcionamento:
 
 1. O usuário acessa o app.
 2. O cadastro é salvo localmente e também pode ser sincronizado com o servidor.
@@ -170,7 +170,7 @@ Esse fluxo evidencia o principal diferencial do projeto: **continuidade de uso n
 
 ---
 
-## Estrutura do projeto
+## Estrutura do projeto:
 
 ```txt
 SIMBIOSIS/
@@ -356,7 +356,27 @@ Essas escolhas reduzem dependência da rede e ajudam a manter o sistema mais lev
 
 ---
 
+## Diferenciais técnicos
 
+* funcionamento offline completo;
+* arquitetura simples de entender e manter;
+* sincronização resiliente;
+* separação clara entre front-end, fila local e API;
+* análise visual local sem depender de serviços externos;
+* foco em áreas onde conexão não é garantida.
+
+---
+
+## Roadmap sugerido
+
+* melhorias na usabilidade mobile;
+* indicadores mais visuais de sincronização;
+* exportação de relatórios;
+* refinamento das heurísticas de análise de imagem;
+* autenticação adicional para múltiplos dispositivos;
+* suporte a mais culturas e cenários agrícolas.
+
+---
 
 ## Créditos
 
