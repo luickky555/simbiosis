@@ -356,27 +356,7 @@ Essas escolhas reduzem dependência da rede e ajudam a manter o sistema mais lev
 
 ---
 
-## Diferenciais técnicos
 
-* funcionamento offline completo;
-* arquitetura simples de entender e manter;
-* sincronização resiliente;
-* separação clara entre front-end, fila local e API;
-* análise visual local sem depender de serviços externos;
-* foco em áreas onde conexão não é garantida.
-
----
-
-## Roadmap sugerido
-
-* melhorias na usabilidade mobile;
-* indicadores mais visuais de sincronização;
-* exportação de relatórios;
-* refinamento das heurísticas de análise de imagem;
-* autenticação adicional para múltiplos dispositivos;
-* suporte a mais culturas e cenários agrícolas.
-
----
 
 ## Créditos
 
